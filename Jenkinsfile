@@ -5,7 +5,8 @@ pipeline {
             args '''-u root \
                     -e HOME=/tmp \
                     -e GOCACHE=/tmp/go-cache \
-                    -e GOPATH=/tmp/go'''
+                    -e GOPATH=/tmp/go \
+                    -v /var/jenkins_home/tools:/var/jenkins_home/tools'''
         }
     }
 
