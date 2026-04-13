@@ -28,6 +28,7 @@ pipeline {
         stage('Setup') {
             steps {
                 sh '''
+                    git config --global --add safe.directory ${WORKSPACE}
                     apt-get update -qq
                     apt-get install -y -qq default-jre-headless
                     go version
