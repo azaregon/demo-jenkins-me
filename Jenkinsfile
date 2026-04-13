@@ -1,15 +1,19 @@
 pipeline {
     agent {
         docker {
-            image 'golang:1.23'
-            reuseNode true
+            image 'golang:1.23-bookworm'
+            args '''-u root \
+                    -e HOME=/tmp \
+                    -e GOCACHE=/tmp/go-cache \
+                    -e GOPATH=/tmp/go'''
         }
     }
 
     environment {
         SONARQUBE_ENV = 'sonarserver'
-        PROJECT_KEY = 'go-project'
-        PROJECT_NAME = 'go-project'
+        PROJECT_KEY   = 'go-project'
+        PROJECT_NAME  = 'go-project'
+        SCANNER_HOME  = tool 'sonarqube8.0'
     }
 
     stages {
@@ -21,10 +25,14 @@ pipeline {
             }
         }
 
-        stage('Setup Go') {
+        stage('Setup') {
             steps {
-                sh 'go version'
-                sh 'go mod tidy'
+                sh '''
+                    apt-get update -qq
+                    apt-get install -y -qq default-jre-headless
+                    go version
+                    go mod download
+                '''
             }
         }
 
@@ -44,12 +52,11 @@ pipeline {
             steps {
                 withSonarQubeEnv("${SONARQUBE_ENV}") {
                     sh """
-                    sonar-scanner \
-                      -Dsonar.projectKey=${PROJECT_KEY} \
-                      -Dsonar.projectName=${PROJECT_NAME} \
-                      -Dsonar.sources=. \
-                      -Dsonar.language=go \
-                      -Dsonar.go.coverage.reportPaths=coverage.out
+                        ${SCANNER_HOME}/bin/sonar-scanner \
+                          -Dsonar.projectKey=${PROJECT_KEY} \
+                          -Dsonar.projectName=${PROJECT_NAME} \
+                          -Dsonar.sources=. \
+                          -Dsonar.go.coverage.reportPaths=coverage.out
                     """
                 }
             }
