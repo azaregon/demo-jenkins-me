@@ -2,7 +2,7 @@ pipeline {
     agent {
         docker {
             image 'golang:1.23'
-            args '-v /var/run/docker.sock:/var/run/docker.sock'
+            reuseNode true
         }
     }
 
