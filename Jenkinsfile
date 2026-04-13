@@ -1,29 +1,68 @@
 pipeline {
     agent any
 
+    environment {
+        SONARQUBE_ENV = 'sonarserver'
+        PROJECT_KEY = 'go-project'
+        PROJECT_NAME = 'go-project'
+    }
+
     stages {
-        stage('Start') {
+        stage('Checkout') {
             steps {
-                echo 'Pipeline started...'
+                git branch: 'main', url: 'https://github.com/hamasfaa/demo-jenkins'
+            }
+        }
+
+        stage('Setup Go') {
+            steps {
+                sh 'go version'
+                sh 'go mod tidy'
             }
         }
 
         stage('Build') {
             steps {
-                echo 'Building project...'
+                sh 'go build -v ./...'
             }
         }
 
         stage('Test') {
             steps {
-                echo 'Running tests...'
+                sh 'go test ./... -v -coverprofile=coverage.out'
             }
         }
 
-        stage('Finish') {
+        stage('SonarQube Analysis') {
             steps {
-                echo 'Pipeline finished successfully ✅'
+                withSonarQubeEnv("${SONARQUBE_ENV}") {
+                    sh """
+                    sonar-scanner \
+                      -Dsonar.projectKey=${PROJECT_KEY} \
+                      -Dsonar.projectName=${PROJECT_NAME} \
+                      -Dsonar.sources=. \
+                      -Dsonar.language=go \
+                      -Dsonar.go.coverage.reportPaths=coverage.out
+                    """
+                }
             }
+        }
+
+        stage('Quality Gate') {
+            steps {
+                timeout(time: 2, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Pipeline sukses'
+        }
+        failure {
+            echo 'Pipeline gagal'
         }
     }
 }
