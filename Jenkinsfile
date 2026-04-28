@@ -28,19 +28,19 @@ pipeline {
 
         stage('Setup') {
             steps {
-
+                sh 'echo setup'
             }
         }
 
         stage('Build') {
             steps {
-
+                sh 'echo build'
             }
         }
 
         stage('Test') {
             steps {
-
+                sh 'echo test'
             }
         }
 
