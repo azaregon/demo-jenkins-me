@@ -1,5 +1,7 @@
 pipeline {
-    agent {}
+    agent {
+        none
+    }
 
     environment {
         SONARQUBE_ENV = 'sonarserver'
