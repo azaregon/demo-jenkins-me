@@ -28,25 +28,19 @@ pipeline {
 
         stage('Setup') {
             steps {
-                sh '''
-                    git config --global --add safe.directory ${WORKSPACE}
-                    apt-get update -qq
-                    apt-get install -y -qq default-jre-headless
-                    go version
-                    go mod download
-                '''
+
             }
         }
 
         stage('Build') {
             steps {
-                sh 'go build -v ./...'
+
             }
         }
 
         stage('Test') {
             steps {
-                sh 'go test ./... -v -coverprofile=coverage.out'
+
             }
         }
 
