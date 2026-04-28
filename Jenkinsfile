@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        SONARQUBE_ENV = 'sonarserver'
+        SONARQUBE_ENV = 'sonqube'
         PROJECT_KEY   = 'go-project'
         PROJECT_NAME  = 'go-project'
         SCANNER_HOME  = tool 'sonqube'
